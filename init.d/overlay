@@ -1,0 +1,79 @@
+#!/sbin/runscript
+# Copyright 1999-2015 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: $
+
+extra_started_commands="sync"
+
+retuval() {
+    retval=${1}
+    eend ${retval}
+    [ ${retval} -ne 0 ] && \
+    ewarn "${2}" && \
+    return 1
+}
+
+
+depend() {
+    need localmount
+}
+
+checkconfig() {
+    checkpath -d "${BASE_DIR}" -m 775 || return 1
+    checkpath -d "${BASE_DIR}/lower" -m 775 || return 1
+    checkpath -d "${BASE_DIR}/upper" -m 775 || return 1
+    checkpath -d "${FINAL_DIR}" -m 775 -o portage:portage || return 1
+    for file in ${SQUASH_IMGS}; do
+        checkpath -f "${BASE_DIR}/${file}.sqfs" -m 664 || return 1
+        checkpath -d "${BASE_DIR}/lower/${file}" -m 775 || return 1
+        checkpath -d "${BASE_DIR}/upper/${file}" -m 775 || return 1
+        checkpath -d "${FINAL_DIR}/${file}" -m 775 -o portage:portage || return 1
+    done
+}
+
+
+start() {
+    checkconfig || return 1
+    for file in ${SQUASH_IMGS}; do
+        mount -o loop "${BASE_DIR}/${file}.sqfs" "${BASE_DIR}/lower/${file}"
+        mount -t tmpfs tmpfs "${BASE_DIR}/upper/${file}"
+        mkdir -p "${BASE_DIR}/upper/${file}/upperdir"
+        mkdir -p "${BASE_DIR}/upper/${file}/workdir"
+        ebegin "Mounting ${file} overlay"
+            mount -t overlay -o \
+                lowerdir="${BASE_DIR}/lower/${file}",upperdir="${BASE_DIR}/upper/${file}/upperdir",workdir="${BASE_DIR}/upper/${file}/workdir" \
+                overlay "${FINAL_DIR}/${file}"
+        eend $?
+    done
+}
+
+stop() {
+    if [ "$RC_RUNLEVEL" != shutdown ]; then
+        for file in ${SQUASH_IMGS};do
+            ebegin "Saving ${file} tree changes to disk"
+                mksquashfs "${FINAL_DIR}/${file}" "${BASE_DIR}/${file}-new.sqfs" ${SQUASH_OPTS}
+            eend $?
+            ebegin "Unmounting ${file} directories"
+                umount "${FINAL_DIR}/${file}"
+                umount "${BASE_DIR}/upper/${file}"
+                umount "${BASE_DIR}/lower/${file}"
+            eend
+            ebegin "Saving ${file} tree backup"
+                mv "${BASE_DIR}/${file}.sqfs" "${BASE_DIR}/${file}-old.sqfs"
+                mv "${BASE_DIR}/${file}-new.sqfs" "${BASE_DIR}/${file}.sqfs"
+            eend
+        done
+    else
+        ewarn "Shutting down, changes in the trees will be lost."
+    fi
+}
+
+sync() {
+    eval "${SYNC_CMD}"
+    restart
+}
+
+restart () {
+    stop
+    start
+}

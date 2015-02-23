@@ -1,0 +1,19 @@
+# /etc/conf.d/overlay: config file for /etc/init.d/overlay
+#
+# Base dir for storing Squash images and overlayfs directories
+BASE_DIR="/var/lib/overlay"
+
+# Base dir for final overlay mounts (i.e. where the contents
+# of the portage tree/overlays will be accessed from)
+FINAL_DIR="/var/portage"
+
+# Options used when creating SquashFS images
+SQUASH_OPTS="-progress -force-uid portage -force-gid portage -comp xz -no-duplicates"
+
+# List of maintained squash images to be used as overlays.
+# You can add more here if needed. Note that images and paths
+# will be named after them
+SQUASH_IMGS="portage layman"
+
+# Command used to sync your portage tree/overlays
+SYNC_CMD="emaint sync -a"
