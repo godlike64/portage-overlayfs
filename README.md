@@ -14,3 +14,7 @@ Just dump both files in the according directories (*/etc/init.d/overlay* for the
 ## TODO
 
 - A script to convert your current trees into suitable squash images.
+
+## Credits
+
+Original credits go to Mathias Laurin for the */etc/init.d/squashfs_portage* script, which used a combination of AUFS + SquashFS.
