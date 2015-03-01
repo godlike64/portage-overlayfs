@@ -50,6 +50,11 @@ start() {
 stop() {
     if [ "$RC_RUNLEVEL" != shutdown ]; then
         for file in ${SQUASH_IMGS};do
+            if [ ${file} == "portage" ]; then
+                ebegin "Removing distfiles to save space"
+                    eval "rm -rf ${FINAL_DIR}/${file}/distfiles/*"
+                eend $?
+            fi
             ebegin "Saving ${file} tree changes to disk"
                 mksquashfs "${FINAL_DIR}/${file}" "${BASE_DIR}/${file}-new.sqfs" ${SQUASH_OPTS}
             eend $?
