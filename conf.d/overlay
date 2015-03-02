@@ -8,7 +8,7 @@ BASE_DIR="/var/lib/overlay"
 FINAL_DIR="/var/portage"
 
 # Options used when creating SquashFS images
-SQUASH_OPTS="-progress -force-uid portage -force-gid portage -comp xz -no-duplicates"
+SQUASH_OPTS="-info -force-uid portage -force-gid portage -comp xz -no-duplicates"
 
 # List of maintained squash images to be used as overlays.
 # You can add more here if needed. Note that images and paths
