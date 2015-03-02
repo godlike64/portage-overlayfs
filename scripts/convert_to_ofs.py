@@ -40,12 +40,10 @@ if __name__ == "__main__":
     COMMAND = 'mksquashfs ORIG DEST -force-uid portage -force-gid portage -comp xz -no-duplicates'
     if args.overlays is None:
         args.overlays = []
-    print args.overlays
     for path in args.overlays:
         if os.path.isdir(path) is True:
             filename = os.path.basename(os.path.normpath(path)) + '.sqfs'
             cmd = COMMAND.replace('ORIG', path).replace('DEST', filename)
-            print cmd
             pid = subprocess.Popen(shlex.split(cmd))
             pid.wait()
         else:
