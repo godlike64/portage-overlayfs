@@ -44,6 +44,7 @@ if __name__ == "__main__":
         if os.path.isdir(path) is True:
             filename = os.path.basename(os.path.normpath(path)) + '.sqfs'
             cmd = COMMAND.replace('ORIG', path).replace('DEST', filename)
+            LOGGER.info("Running command: " + cmd)
             pid = subprocess.Popen(shlex.split(cmd))
             pid.wait()
         else:
