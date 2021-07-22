@@ -17,8 +17,8 @@ def setup_logging():
 def check_overlayfs_support():
     try:
         f = gzip.open('/proc/config.gz', 'r')
-        content = f.read()
-        return 'CONFIG_OVERLAY_FS=y' in content
+        content = f.read().decode('utf-8')
+        return 'CONFIG_OVERLAY_FS=y' in content or 'CONFIG_OVERLAY_FS=m' in content
     except IOError:
         LOGGER.warning('Could not find /proc/config.gz. Cannot check for overlayfs support reliably!')
 

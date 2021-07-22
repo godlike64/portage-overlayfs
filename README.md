@@ -11,9 +11,7 @@ Just dump both files in the according directories (*/etc/init.d/overlay* for the
 
 **Note: you must have valid images at the specified path and name for the script to work.**
 
-## TODO
-
-- A script to convert your current trees into suitable squash images.
+A script is provided under /scripts/ to convert your current trees into suitable squash images.
 
 ## Credits
 
